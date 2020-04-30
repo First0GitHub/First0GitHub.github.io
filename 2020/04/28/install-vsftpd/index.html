@@ -20,16 +20,17 @@
     var CONFIG = {"hostname":"yoursite.com","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
-  <meta name="description" content="简单描述信息">
+  <meta name="description" content="Linux简单安装vsftpd服务端，并不太熟练，马马虎虎~，马马虎虎！">
 <meta property="og:type" content="article">
-<meta property="og:title" content="install-vsftpd">
+<meta property="og:title" content="Linux安装vsftpd服务器(FTP)">
 <meta property="og:url" content="http://yoursite.com/2020/04/28/install-vsftpd/index.html">
 <meta property="og:site_name" content="STU">
-<meta property="og:description" content="简单描述信息">
+<meta property="og:description" content="Linux简单安装vsftpd服务端，并不太熟练，马马虎虎~，马马虎虎！">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2020-04-28T02:51:32.000Z">
-<meta property="article:modified_time" content="2020-04-28T02:51:32.812Z">
+<meta property="article:modified_time" content="2020-04-30T06:46:31.389Z">
 <meta property="article:author" content="STU">
+<meta property="article:tag" content="Linux">
 <meta name="twitter:card" content="summary">
 
 <link rel="canonical" href="http://yoursite.com/2020/04/28/install-vsftpd/">
@@ -45,7 +46,7 @@
   };
 </script>
 
-  <title>install-vsftpd | STU</title>
+  <title>Linux安装vsftpd服务器(FTP) | STU</title>
   
 
 
@@ -206,7 +207,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          install-vsftpd
+          Linux安装vsftpd服务器(FTP)
         </h1>
 
         <div class="post-meta">
@@ -218,8 +219,25 @@
 
               <time title="创建时间：2020-04-28 10:51:32" itemprop="dateCreated datePublished" datetime="2020-04-28T10:51:32+08:00">2020-04-28</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-04-30 14:46:31" itemprop="dateModified" datetime="2020-04-30T14:46:31+08:00">2020-04-30</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B1%BB/" itemprop="url" rel="index"><span itemprop="name">操作类</span></a>
+                </span>
+            </span>
 
           
+            <div class="post-description">Linux简单安装vsftpd服务端，并不太熟练，马马虎虎~，马马虎虎！</div>
 
         </div>
       </header>
@@ -230,7 +248,101 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        
+        <h1 id="一、FTP的（主动模式）和（被动模式）"><a href="#一、FTP的（主动模式）和（被动模式）" class="headerlink" title="一、FTP的（主动模式）和（被动模式）"></a><strong>一、FTP的（主动模式）和（被动模式）</strong></h1><blockquote>
+<p>首先先了解，ftp的工作方式</p>
+</blockquote>
+<p><strong>1、PORT（主动模式</strong></p>
+<p>​        PORT中文称为主动模式，工作的原理： FTP客户端连接到FTP服务器的21端口，发送用户名和密码登录，登录成功后要list列表或者读取数据时，客户端随机开放一个端口（1024以上）， 发送 PORT命令到FTP服务器，告诉服务器客户端采用主动模式并开放端口；FTP服务器收到PORT主动模式命令和端口号后，通过服务器的20端口和客户端 开放的端口连接，发送数据</p>
+<p><strong>2、PASV（被动模式）</strong></p>
+<p>​     PASV是Passive的缩写，中文成为被动模式，工作原理：FTP 客户端连接到FTP服务器的21端口，发送用户名和密码登录，登录成功后要list列表或者读取数据时，发送PASV命令到FTP服务器， 服务器在本地随机开放一个端口（1024以上），然后把开放的端口告诉客户端， 客户端再连接到服务器开放的端口进行数据传输</p>
+<p><strong>简单来说：</strong></p>
+<p>​        主动模式，服务器开放21和20端口，客户端随机开放连接端口，服务器用20连接客户端开放的端口；</p>
+<p>​        被动模式，服务器开放21和任意端口，客户端连接服务端开放的端口；</p>
+<p>一句话：主动模式传送数据时是“服务器”连接到“客户端”的端口；被动模式传送数据是“客户端”连接到“服务器”的端口。 </p>
+<blockquote>
+<p>常用被动模式，客户端大多默认被动模式</p>
+</blockquote>
+<h1 id="二、安装vsftpd"><a href="#二、安装vsftpd" class="headerlink" title="二、安装vsftpd"></a>二、安装vsftpd</h1><p>首先，我们执行安装命令：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yum install -y vsftpd</span><br></pre></td></tr></table></figure>
+
+<p>安装成功后我们进入FTP文件夹查看是否有问题，FTP在Linux上名称为 vsftpd ，默认安装在  /etc/vsftpd 目录下；</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">ftpusers　　<span class="comment">#黑名单文件，此文件里的用户不允许访问 FTP 服务器</span></span><br><span class="line">user_list　　<span class="comment">#白名单文件，是允许访问 FTP 服务器的用户列表</span></span><br><span class="line">vsftpd.conf 　<span class="comment">#核心配置文件</span></span><br><span class="line">vsftpd_conf_migrate.sh　　<span class="comment">#FTP服务</span></span><br></pre></td></tr></table></figure>
+
+
+
+<h1 id="三、创建ftp用户"><a href="#三、创建ftp用户" class="headerlink" title="三、创建ftp用户"></a>三、创建ftp用户</h1><p>在linux命令</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#useradd ftpuser	#创建用户</span></span><br><span class="line">useradd -s /sbin/nologin  -d /hemo/ftpuser  ftpuser	<span class="comment">#创建不可登陆Linux系统用户，-d并指用户定位置</span></span><br><span class="line">passwd ftpuser <span class="comment">#设置密码</span></span><br><span class="line">mkdir /data/ftp	<span class="comment">#创建ftp存放文件的文件夹</span></span><br><span class="line">chown -R /data/ftp	<span class="comment">#授权</span></span><br></pre></td></tr></table></figure>
+
+
+
+<h1 id="四、配置"><a href="#四、配置" class="headerlink" title="四、配置"></a>四、配置</h1><p>进入/etc/vsftpd目录，vi修改user_list配置登录白名单用户</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># vsftpd userlist</span></span><br><span class="line"><span class="comment"># If userlist_deny=NO, only allow users in this file</span></span><br><span class="line"><span class="comment"># If userlist_deny=YES (default), never allow users in this file, and</span></span><br><span class="line"><span class="comment"># do not even prompt for a password.</span></span><br><span class="line"><span class="comment"># Note that the default vsftpd pam config also checks /etc/vsftpd/ftpusers</span></span><br><span class="line"><span class="comment"># for users that are denied.</span></span><br><span class="line"><span class="comment">#root                                </span></span><br><span class="line">ftpuser</span><br></pre></td></tr></table></figure>
+
+<p>vi修改vsftpd.conf核心配置文件,详细配置参考；根据需求自己配置</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">anonymous_enable=NO		<span class="comment">#关闭匿名访问</span></span><br><span class="line">anonymous_enable=NO  <span class="comment">#允许匿名用户访问为了安全选择关闭</span></span><br><span class="line">local_enable=YES   <span class="comment"># 允许本地用户登录</span></span><br><span class="line">write_enable=YES   <span class="comment"># 是否允许写入</span></span><br><span class="line">local_umask=022  <span class="comment"># 本地用户上传文件的umask</span></span><br><span class="line">dirmessage_enable=YES <span class="comment">#为YES则进入目录时显示此目录下由message_file选项指定的文本文件(,默认为.message)的内容</span></span><br><span class="line">xferlog_enable=YES <span class="comment">#开启日志</span></span><br><span class="line">xferlog_std_format=YES <span class="comment">#标准格式</span></span><br><span class="line">connect_from_port_20=YES	<span class="comment">#开启20端口（主动模式）</span></span><br><span class="line">xferlog_file=/var/<span class="built_in">log</span>/xferlog   <span class="comment">#ftp日志目录	</span></span><br><span class="line">idle_session_timeout=6000 <span class="comment">#设置客户端连接时间</span></span><br><span class="line">data_connection_timeout=1200 <span class="comment">#设置数据连接时间 针对上传，下载</span></span><br><span class="line">chroot_list_enable=YES</span><br><span class="line">chroot_list_file=/etc/vsftpd/chroot_list <span class="comment">#设置为YES则下面的控制有效</span></span><br><span class="line">chroot_list_enable=YES <span class="comment">#若为NO,则记录在chroot_list_file所指定的文件(默认是/etc/vsftpd.chroot_list)中的用户将被chroot在登录后所在目录中,无法离开.如果为YES,则所记录的用户将不被chroot.这里YES.</span></span><br><span class="line">chroot_local_user=YES</span><br><span class="line">userlist_file=/etc/vsftpd/user_list <span class="comment">#白名单</span></span><br><span class="line">userlist_deny=NO <span class="comment">#若设置为YES则记录在userlist_file选项指定文件(默认是/etc/vsftpd.user_list)中的用户将无法login,并且将检察下面的userlist_deny选项</span></span><br><span class="line">userlist_enable=YES <span class="comment">#若为NO,则仅接受记录在userlist_file选项指定文件(默认是/etc/vsftpd.user_list)中的用户的login请求.若为YES则不接受这些用户的请求.</span></span><br><span class="line">chroot_list_enable=YES	<span class="comment">#目录权限控制</span></span><br><span class="line">local_root=/data/ftp <span class="comment">#根目录</span></span><br><span class="line">listen=YES</span><br><span class="line">pam_service_name=vsftpd</span><br><span class="line">userlist_enable=YES</span><br><span class="line">tcp_wrappers=YES</span><br></pre></td></tr></table></figure>
+
+<p>可以主动和被动模式同时并存</p>
+<p>基本配置：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line">anonymous_enable=NO</span><br><span class="line">local_enable=YES</span><br><span class="line">write_enable=YES</span><br><span class="line">local_umask=022</span><br><span class="line">dirmessage_enable=YES</span><br><span class="line">xferlog_enable=YES</span><br><span class="line">xferlog_std_format=YES</span><br><span class="line">xferlog_file=/var/<span class="built_in">log</span>/xferlog</span><br><span class="line">pam_service_name=vsftpd</span><br><span class="line">tcp_wrappers=YES     </span><br><span class="line"><span class="comment"># 用户只能访问指定目录不能访问目录的上一级    </span></span><br><span class="line">chroot_local_user=YES</span><br><span class="line">chroot_list_enable=NO</span><br><span class="line">allow_writeable_chroot=YES</span><br><span class="line"><span class="comment"># 指定ftp根目录下</span></span><br><span class="line">local_root=/data/ftp</span><br><span class="line"><span class="comment"># 禁止删除</span></span><br><span class="line">cmds_denied=DELE</span><br><span class="line"><span class="comment"># 启用用户列表</span></span><br><span class="line">userlist_enable=YES</span><br><span class="line">userlist_deny=NO</span><br><span class="line">userlist_file=/etc/vsftpd/user_list</span><br><span class="line"><span class="comment"># 如果开启被动模式，需要改成listen=YES,listen_ipv6=NO；默认是listen_ipv6=YES,listen=NO</span></span><br><span class="line">listen=YES</span><br><span class="line">listen_ipv6=NO</span><br><span class="line"></span><br><span class="line"><span class="comment">#主动模式配置</span></span><br><span class="line">port_enable=YES <span class="comment">#开启主动模式</span></span><br><span class="line">connect_from_port_20=YES <span class="comment">#当主动模式开启的时候 是否启用默认的20端口监听 </span></span><br><span class="line">ftp_date_port=8888 <span class="comment">#自定义数据传输端口，#当Connect_from_port_20=NO</span></span><br><span class="line"><span class="comment">#被动模式配置</span></span><br><span class="line">pasv_enable=YES <span class="comment">#开启被动模式</span></span><br><span class="line">pasv_min_port=66666 <span class="comment">#被动模式最低端口</span></span><br><span class="line">pasv_max_port=77777 <span class="comment">#被动模式最高端口</span></span><br><span class="line">pasv_address=XXX.XX.XX.XXX <span class="comment">#ftp外网IP或外网域名</span></span><br><span class="line">pasv_addr_resolve=NO	<span class="comment">#域名转IP</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>限制用户在指定目录下：</strong></p>
+<p>必须要加：allow_writeable_chroot=YES；这个配置才能登陆成功</p>
+<p> 需要使用到chroot_local_user,chroot_list_enable,chroot_list_file这三个选项 </p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>chroot_local_user=YES</th>
+<th>chroot_local_user=NO</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>chroot_list_enable=YES</td>
+<td>1.所有用户都被限制在其主目录下 2.使用chroot_list_file指定的用户列表，这些用户作为“例外”，不受限制</td>
+<td>1.所有用户都不被限制其主目录下 2.使用chroot_list_file指定的用户列表，这些用户作为“例外”，受到限制</td>
+</tr>
+<tr>
+<td>chroot_list_enable=NO</td>
+<td>1.所有用户都被限制在其主目录下 2.不使用chroot_list_file指定的用户列表，没有任何“例外”用户，受到限制</td>
+<td>1.所有用户都不被限制其主目录下 2.不使用chroot_list_file指定的用户列表，没有任何“例外”用户，不受限制</td>
+</tr>
+</tbody></table>
+<p>可以这样记忆： chroot_local_user总是一个全局性的设定，其为YES时，全部用户被锁定于主目录，其为NO时，全部用户不被锁定于主目录。那么我们势必需要在全局设定下能做出一些“微调”，即，我们总是需要一种“例外机制”，所以当chroot_list_enable=YES时，表示我们“需要例外”。而”例外“的含义总是有一个上下文的，即，当”全部用户被锁定于主目录“时（即chroot_local_user=YES），”例外”就是：不被锁定的用户是哪些；当”全部用户不被锁定于主目录”时（即chroot_local_user=NO），”例外”“就是：要被锁定的用户是哪些。</p>
+<p>让我们举个例子:<br>    假设有ftp1, ftp2两个ftp用户, 计划让ftp1用户锁定在主目录下，不允许切换到其他目录, 但是允许ftp2用户自由切换目录，则可以分如下两种方式实现：</p>
+<p>方式一：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">allow_writeable_chroot=YES</span><br><span class="line">chroot_local_user=YES</span><br><span class="line">chroot_list_enable=YES</span><br><span class="line">chroot_list_file=/etc/vsftpd/chroot_list</span><br><span class="line"><span class="comment">#/etc/vsftpd/chroot_list名单列表为: ftp2</span></span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>解释：chroot_local_user=YES将所有用户限定在主目录内，chroot_list_enable=YES表示要启用chroot_list_file, 因为chroot_local_user=YES，即全体用户都被“限定在主目录内”,所以总是作为“例外列表”的chroot_list_file这时列出的是那些“不会被限制在主目录下”的用户。</p>
+</blockquote>
+<p>方式二：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">allow_writeable_chroot=YES</span><br><span class="line">chroot_local_user=NO</span><br><span class="line">chroot_list_enable=YES</span><br><span class="line">chroot_list_file=/etc/vsftpd/chroot_list</span><br><span class="line"><span class="comment">#/etc/vsftpd/chroot_list名单列表为: ftp1</span></span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>解释：chroot_local_user=NO则所有用户不被限定在主目录内，chroot_list_enable=YES表示要启用chroot_list_file, 因为chroot_local_user=NO，即全体用户都“不被限定在主目录内”,所以总是作为“例外列表”的chroot_list_file这时列出的是那些“会被限制在主目录下”的用户。</p>
+</blockquote>
+<p>全部限制</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">chroot_local_user=YES</span><br><span class="line">chroot_list_enable=NO</span><br></pre></td></tr></table></figure>
+
+<p>全部不限制</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">chroot_local_user=NO</span><br><span class="line">chroot_list_enable=NO</span><br></pre></td></tr></table></figure>
+
+<p><strong>不同用户不同跟目录</strong></p>
+<p>需要加： user_config_dir=/etc/vsftpd/vsftpd_user_conf；配置指定用户目录的文件夹，并在里面创建用户对应的文件</p>
+<p>例如：创建/etc/vsftpd/vsftpd_user_conf/ftpuser1文件添加内容</p>
+<p> local_root=/ftpdata</p>
+<p>禁止删除 </p>
+<p>cmds_denied=DELE</p>
+<h1 id="五、启动与关闭"><a href="#五、启动与关闭" class="headerlink" title="五、启动与关闭"></a>五、启动与关闭</h1><p>systemctl start vsftpd    # 启动</p>
+<p>systemctl restart vsftpd    # 重启</p>
+<p>systemctl status vsftpd    # 查看状态</p>
+<p>systemctl stop vsftpd    # 关闭</p>
+<h1 id="六、连接"><a href="#六、连接" class="headerlink" title="六、连接"></a>六、连接</h1><p>使用工具或浏览器</p>
+<p>使用工具记得选择连接模式，主动/被动模式</p>
+<p>浏览器、工具访问：ftp://{ip地址}:{port端口号}</p>
+<p>参考地址：<a href="https://www.cnblogs.com/Wang352051443/p/9805980.html" target="_blank" rel="noopener">https://www.cnblogs.com/Wang352051443/p/9805980.html</a></p>
+<p>参考地址：<a href="https://blog.csdn.net/weixin_34405557/article/details/92875891" target="_blank" rel="noopener">https://blog.csdn.net/weixin_34405557/article/details/92875891</a></p>
+
     </div>
 
     
@@ -238,6 +350,9 @@
     
 
       <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Linux/" rel="tag"># Linux</a>
+          </div>
 
         
 
@@ -248,7 +363,10 @@
     <a href="/2020/04/24/install-svn/" rel="prev" title="Linux安装svn服务端">
       <i class="fa fa-chevron-left"></i> Linux安装svn服务端
     </a></div>
-      <div class="post-nav-item"></div>
+      <div class="post-nav-item">
+    <a href="/2020/04/30/install-frp/" rel="next" title="服务器搭建frp内网穿透">
+      服务器搭建frp内网穿透 <i class="fa fa-chevron-right"></i>
+    </a></div>
     </div>
       </footer>
     
@@ -307,6 +425,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#一、FTP的（主动模式）和（被动模式）"><span class="nav-number">1.</span> <span class="nav-text">一、FTP的（主动模式）和（被动模式）</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#二、安装vsftpd"><span class="nav-number">2.</span> <span class="nav-text">二、安装vsftpd</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#三、创建ftp用户"><span class="nav-number">3.</span> <span class="nav-text">三、创建ftp用户</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#四、配置"><span class="nav-number">4.</span> <span class="nav-text">四、配置</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#五、启动与关闭"><span class="nav-number">5.</span> <span class="nav-text">五、启动与关闭</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#六、连接"><span class="nav-number">6.</span> <span class="nav-text">六、连接</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -322,7 +441,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">12</span>
+          <span class="site-state-item-count">13</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
